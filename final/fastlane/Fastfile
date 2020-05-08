@@ -31,14 +31,14 @@ platform :android do
 		gradle(
 			task: 'clean'
 		)
-		gradle(
-			task: 'assemble',
-			build_type: 'Debug'
-		)
-		gradle(
-			task: 'assemble',
-			build_type: 'AndroidTest'
-		)
+		# gradle(
+		# 	task: 'assemble',
+		# 	build_type: 'Debug'
+		# )
+		# gradle(
+		# 	task: 'assemble',
+		# 	build_type: 'AndroidTest'
+		# )
 	end
 
 	desc "Submit a new Beta Build to Firebase App Distribution"
