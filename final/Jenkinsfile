@@ -1,31 +1,44 @@
 #!/usr/bin/env groovy
 
-def label = "mypod-${UUID.randomUUID().toString()}"
+// def label = "mypod-${UUID.randomUUID().toString()}"
 
-podTemplate(label: label,
-    namespace: "cje-slaves-digitalhealth-dmz",
-    containers: [
-        containerTemplate(name: 'android',
-                          image: "mingc/android-build-box:latest",
-                          ttyEnabled: true,
-                          command: 'cat',
-                          resourceRequestCpu: '3000m',
-                          resourceRequestMemory : '10Gi',
-                          resourceLimitCpu: '3000m',
-                          resourceLimitMemory: '10Gi')
-    ]
-) {
-    node(label) {
-        container('android') {
-            stage('Git Checkout') {
-                checkout scm
-            }
+// podTemplate(label: label,
+//     namespace: "cje-slaves-digitalhealth-dmz",
+//     containers: [
+//         containerTemplate(name: 'android',
+//                           image: "mingc/android-build-box:latest",
+//                           ttyEnabled: true,
+//                           command: 'cat',
+//                           resourceRequestCpu: '3000m',
+//                           resourceRequestMemory : '10Gi',
+//                           resourceLimitCpu: '3000m',
+//                           resourceLimitMemory: '10Gi')
+//     ]
+// ) {
+//     node(label) {
+//         container('android') {
+//             stage('Git Checkout') {
+//                 checkout scm
+//             }
             
-            stage('Clean & Compile') {
-                script{
-                        sh "fastlane build_for_screengrab"
-                }
+//             stage('Clean & Compile') {
+//                 script{
+//                         sh "fastlane build_for_screengrab"
+//                 }
+//             }
+//         }  // End of Container - node.
+//     } // End of Node - label
+// } // End of Pod Template
+
+pipeline {
+    agent {
+        docker { image 'mingc/android-build-box:latest' }
+    }
+    stages {
+        stage('Test') {
+            steps {
+                sh 'fastlane --version'
             }
-        }  // End of Container - node.
-    } // End of Node - label
-} // End of Pod Template
+        }
+    }
+}
