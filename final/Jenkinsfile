@@ -58,24 +58,25 @@ pipeline {
 
             steps {
                 sh "sudo chown root:jenkins /var/run/docker.sock"
+                sh "docker ps -a"
             }
 
         }
 
-        stage('Step 1') {
+        // stage('Step 1') {
 
-            agent {
-                docker {
-                    image 'nezarfadle/tools'
-                    reuseNode true
-                }
-            }
+        //     agent {
+        //         docker {
+        //             image 'nezarfadle/tools'
+        //             reuseNode true
+        //         }
+        //     }
 
-            steps {
-                sh "ls /"
-            }
+        //     steps {
+        //         sh "ls /"
+        //     }
 
-        }
+        // }
 
     }
 }
