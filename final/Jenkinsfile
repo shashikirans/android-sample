@@ -54,15 +54,10 @@ pipeline {
 
         stage("Fix the permission issue") {
 
-            agent {
-                        docker {
-                            image 'ubuntu:xenial'
-                            // args '-v ${WORKSPACE}/../builds/${BUILD_ID}:/job:rw'
-                        }
-                    }
+            agent any
 
             steps {
-                sh "sudo chown root:jenkins var/run/docker.sock"
+                sh "sudo chown root:jenkins /run/docker.sock"
             }
 
         }
