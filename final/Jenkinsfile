@@ -46,12 +46,19 @@
 //     }
 // }
 
-node() {
-    String jenkinsUserId = sh(returnStdout: true, script: 'id -u jenkins').trim()
-    String dockerGroupId = sh(returnStdout: true, script: 'id -g | cut -d: -f3').trim()
-    String containerUserMapping = "-u $jenkinsUserId:$dockerGroupId "
-    docker.image('ubuntu')
-        .inside(containerUserMapping + ' -v /var/run/docker.sock:/var/run/docker.sock:ro') {
-             sh "..."
-         }
+pipeline {
+    agent {
+        docker {
+            image 'ubuntu'
+            args '-u root:sudo -v $HOME/workspace/android-sample:/final'
+        }
+    }
+    stages {
+        stage("setup_env") {
+            steps {
+                sh 'ls -l'
+            }
+        }
+    }
+  
 }
