@@ -47,18 +47,18 @@
 // }
 
 pipeline {
-    agent {
-        docker {
-            image 'ubuntu'
-            // args '-u root:sudo -v $HOME/workspace/android-sample:/final'
-        }
-    }
+    agent any
     stages {
-        stage("setup_env") {
+        stage('install node modules...') {
+            agent { 
+                docker { 
+                        image 'node:8'
+                        args '-u root:root'
+                    }
+             }
             steps {
                 sh 'ls -l'
             }
         }
     }
-  
 }
