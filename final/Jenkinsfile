@@ -1,47 +1,97 @@
-#!/usr/bin/env groovy
+// #!/usr/bin/env groovy
 
-// def label = "mypod-${UUID.randomUUID().toString()}"
+// // def label = "mypod-${UUID.randomUUID().toString()}"
 
-// podTemplate(label: label,
-//     namespace: "cje-slaves-digitalhealth-dmz",
-//     containers: [
-//         containerTemplate(name: 'android',
-//                           image: "mingc/android-build-box:latest",
-//                           ttyEnabled: true,
-//                           command: 'cat',
-//                           resourceRequestCpu: '3000m',
-//                           resourceRequestMemory : '10Gi',
-//                           resourceLimitCpu: '3000m',
-//                           resourceLimitMemory: '10Gi')
-//     ]
-// ) {
-//     node(label) {
-//         container('android') {
-//             stage('Git Checkout') {
-//                 checkout scm
-//             }
+// // podTemplate(label: label,
+// //     namespace: "cje-slaves-digitalhealth-dmz",
+// //     containers: [
+// //         containerTemplate(name: 'android',
+// //                           image: "mingc/android-build-box:latest",
+// //                           ttyEnabled: true,
+// //                           command: 'cat',
+// //                           resourceRequestCpu: '3000m',
+// //                           resourceRequestMemory : '10Gi',
+// //                           resourceLimitCpu: '3000m',
+// //                           resourceLimitMemory: '10Gi')
+// //     ]
+// // ) {
+// //     node(label) {
+// //         container('android') {
+// //             stage('Git Checkout') {
+// //                 checkout scm
+// //             }
             
-//             stage('Clean & Compile') {
-//                 script{
-//                         sh "fastlane build_for_screengrab"
-//                 }
+// //             stage('Clean & Compile') {
+// //                 script{
+// //                         sh "fastlane build_for_screengrab"
+// //                 }
+// //             }
+// //         }  // End of Container - node.
+// //     } // End of Node - label
+// // } // End of Pod Template
+
+// pipeline {
+//     agent {
+//         docker { 
+//             image 'mingc/android-build-box:latest'
+//             args '-u root:sudo'
 //             }
-//         }  // End of Container - node.
-//     } // End of Node - label
-// } // End of Pod Template
+//     }
+//     stages {
+//         stage('Test') {
+//             steps {
+//                 sh 'fastlane --version'
+//             }
+//         }
+//     }
+// }
 
 pipeline {
     agent {
-        docker { 
-            image 'mingc/android-build-box:latest'
-            args '-u root:sudo' 
-            }
-    }
-    stages {
-        stage('Test') {
-            steps {
-                sh 'fastlane --version'
-            }
+        docker {
+            image 'ubuntu'
+            args '-u root:sudo -v $HOME/workspace/androids-sample:/final'
         }
     }
+    stages {
+        stage("setup_env") {
+            steps {
+                sh 'ls -l'
+                // sh 'apt-get install -y git build-essential gcc cmake make'
+            }
+        }
+
+        // stage("install_dependencies") {
+        //     steps {
+        //         sh 'apt-get install -y libxml2-dev'
+        //     }
+        // }
+        // stage("compile_dpi") {
+        //     steps {
+        //         sh 'cd /myproject && make clean && make -j4'
+        //     }
+        // }
+
+        // stage("install_dpi") {
+        //     steps {
+        //         sh 'cd /myproject && make install'
+        //     }
+        // }
+
+        // stage("test") {
+        //     steps {
+        //         sh 'do some test here'
+        //     }
+        // }
+    }
+    // post {
+    //     success {
+    //         echo 'Do something when it is successful'
+    //         bitbucketStatusNotify(buildState: 'SUCCESSFUL')
+    //     }
+    //     failure {
+    //         echo 'Do something when it is failed'
+    //         bitbucketStatusNotify(buildState: 'FAILED')
+    //     }
+    // }
 }
