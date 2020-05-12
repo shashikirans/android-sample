@@ -48,10 +48,7 @@
 
 pipeline {
     agent {
-        docker {
-            image 'ubuntu'
-            args '-u root:sudo -v $HOME/workspace/android-sample:/final'
-        }
+        docker.image('ubuntu:14.04').withRun('-u root')
     }
     stages {
         stage("setup_env") {
