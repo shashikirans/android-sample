@@ -1,81 +1,91 @@
-// #!/usr/bin/env groovy
+// // #!/usr/bin/env groovy
 
-// // def label = "mypod-${UUID.randomUUID().toString()}"
+// // // def label = "mypod-${UUID.randomUUID().toString()}"
 
-// // podTemplate(label: label,
-// //     namespace: "cje-slaves-digitalhealth-dmz",
-// //     containers: [
-// //         containerTemplate(name: 'android',
-// //                           image: "mingc/android-build-box:latest",
-// //                           ttyEnabled: true,
-// //                           command: 'cat',
-// //                           resourceRequestCpu: '3000m',
-// //                           resourceRequestMemory : '10Gi',
-// //                           resourceLimitCpu: '3000m',
-// //                           resourceLimitMemory: '10Gi')
-// //     ]
-// // ) {
-// //     node(label) {
-// //         container('android') {
-// //             stage('Git Checkout') {
-// //                 checkout scm
-// //             }
+// // // podTemplate(label: label,
+// // //     namespace: "cje-slaves-digitalhealth-dmz",
+// // //     containers: [
+// // //         containerTemplate(name: 'android',
+// // //                           image: "mingc/android-build-box:latest",
+// // //                           ttyEnabled: true,
+// // //                           command: 'cat',
+// // //                           resourceRequestCpu: '3000m',
+// // //                           resourceRequestMemory : '10Gi',
+// // //                           resourceLimitCpu: '3000m',
+// // //                           resourceLimitMemory: '10Gi')
+// // //     ]
+// // // ) {
+// // //     node(label) {
+// // //         container('android') {
+// // //             stage('Git Checkout') {
+// // //                 checkout scm
+// // //             }
             
-// //             stage('Clean & Compile') {
-// //                 script{
-// //                         sh "fastlane build_for_screengrab"
-// //                 }
+// // //             stage('Clean & Compile') {
+// // //                 script{
+// // //                         sh "fastlane build_for_screengrab"
+// // //                 }
+// // //             }
+// // //         }  // End of Container - node.
+// // //     } // End of Node - label
+// // // } // End of Pod Template
+
+// // pipeline {
+// //     agent {
+// //         docker { 
+// //             image 'mingc/android-build-box:latest'
+// //             args '-u root:sudo' 
 // //             }
-// //         }  // End of Container - node.
-// //     } // End of Node - label
-// // } // End of Pod Template
+// //     }
+// //     stages {
+// //         stage('Test') {
+// //             steps {
+// //                 sh 'fastlane --version'
+// //             }
+// //         }
+// //     }
+// // }
 
 // pipeline {
-//     agent {
-//         docker { 
-//             image 'mingc/android-build-box:latest'
-//             args '-u root:sudo' 
-//             }
-//     }
+
+//     agent none
+
 //     stages {
-//         stage('Test') {
+
+//         stage("Fix the permission issue") {
+
+//             agent any
+
 //             steps {
-//                 sh 'fastlane --version'
+//                 sh "sudo chown root:jenkins /var/run/docker.sock"
 //             }
+
 //         }
+
+//         stage('Step 1') {
+
+//             agent {
+//                 docker {
+//                     image 'nezarfadle/tools'
+//                     reuseNode true
+//                 }
+//             }
+
+//             steps {
+//                 sh "ls /"
+//             }
+
+//         }
+
 //     }
 // }
 
-pipeline {
-
-    agent none
-
-    stages {
-
-        stage("Fix the permission issue") {
-
-            agent any
-
-            steps {
-                sh "sudo chown root:jenkins /var/run/docker.sock"
-            }
-
-        }
-
-        stage('Step 1') {
-
-            agent {
-                docker {
-                    image 'nezarfadle/tools'
-                    reuseNode true
-                }
-            }
-
-            steps {
-                sh "ls /"
-            }
-
-        }
-
-    }
+node() {
+    String jenkinsUserId = sh(returnStdout: true, script: 'id -u jenkins').trim()
+    String dockerGroupId = sh(returnStdout: true, script: 'getent group docker | cut -d: -f3').trim()
+    String containerUserMapping = "-u $jenkinsUserId:$dockerGroupId "
+    docker.image('mingc/android-build-box:latest')
+        .inside(containerUserMapping + ' -v /var/run/docker.sock:/var/run/docker.sock:ro') {
+             sh "ls /"
+         }
 }
