@@ -32,7 +32,10 @@
 
 pipeline {
     agent {
-        docker { image 'mingc/android-build-box:latest' }
+        docker { 
+            image 'mingc/android-build-box:latest'
+            args '-u root:sudo' 
+            }
     }
     stages {
         stage('Test') {
