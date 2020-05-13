@@ -52,12 +52,11 @@ pipeline {
         stage('install node modules...') {
             agent { 
                 docker { 
-                        image 'node:8'
-                        args '-u root:root'
+                        image 'jenkins-docker'
                     }
              }
             steps {
-                sh 'ls -l'
+                sh 'docker images'
             }
         }
     }
