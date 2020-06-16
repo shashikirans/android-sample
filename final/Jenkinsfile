@@ -1,12 +1,10 @@
 pipeline {
     agent {
-         dockerfile {
-            filename 'final/Dockerfile.jenkinsAgent'
-            additionalBuildArgs  '--build-arg JENKINSUID=`id -u jenkins` --build-arg JENKINSGID=`id -g jenkins` --build-arg DOCKERGID=`stat -f %g /var/run/docker.sock`'
-            args '-v /var/run/docker.sock:/var/run/docker.sock -u jenkins:docker'
-        }
+        docker { 
+            image 'mingc/android-build-box:latest'
+            }
     }
-        stages {
+    stages {
         stage('Test') {
             steps {
                 sh 'fastlane --version'
