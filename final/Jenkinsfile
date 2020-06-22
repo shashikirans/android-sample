@@ -1,16 +1,58 @@
 pipeline {
     agent {
-         dockerfile {
-            filename 'final/Dockerfile.jenkinsAgent'
-            additionalBuildArgs  '--build-arg JENKINSUID=`id -u jenkins` --build-arg JENKINSGID=`id -g jenkins` --build-arg DOCKERGID=`stat -f %g /var/run/docker.sock`'
-            args '-v /var/run/docker.sock:/var/run/docker.sock -u jenkins:docker'
-        }
+        docker { 
+            image 'opengamer/android-sdk-gradle-fastlane:latest'
+            }
     }
-        stages {
-        stage('Test') {
+    stages {
+        stage('clean') {
             steps {
-                sh 'fastlane --version'
+                script {
+					dir("android-sample/final"){
+					 sh 'fastlane clean'
+					}
+				}
+            }
+        }
+        stage('lint') {
+            steps {
+                script {
+					dir("android-sample/final"){
+					 sh 'fastlane lint'
+                     step([$class: 'LintPublisher', pattern: 'app/build/reports/lint-results*.xml'])
+					}
+				}
+            }
+        }
+        stage('Test1') {
+            steps {
+                	dir("android-sample/final"){
+                 	 sh 'chmod -R 755 .'
+					 sh 'ruby -v'
+					 sh 'fastlane test'
+                     publishUnitTests()
+					}
+            }
+        }
+        stage('Build') {
+            steps {
+                	dir("android-sample/final"){
+                 	 sh 'chmod -R 755 .'
+					 sh 'ruby -v'
+					 sh 'fastlane build'
+					}
             }
         }
     }
+}
+
+def publishUnitTests() {
+  publishHTML target: [
+    allowMissing: true,
+    alwaysLinkToLastBuild: true,
+    keepAll: true,
+    reportDir: 'app/build/reports/tests/testDevDebugUnitTest',
+    reportFiles: 'index.html',
+    reportName: 'Unit Test Reports'
+  ]
 }

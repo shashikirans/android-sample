@@ -21,6 +21,10 @@ android {
     versionName "1.0"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
   }
+  lintOptions {
+      abortOnError false
+      lintConfig file("../lint.xml")
+  }
   buildTypes {
     release {
       minifyEnabled false
