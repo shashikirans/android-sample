@@ -51,7 +51,7 @@ def publishUnitTests() {
     allowMissing: true,
     alwaysLinkToLastBuild: true,
     keepAll: true,
-    reportDir: 'app/build/reports/tests/testDevDebugUnitTest',
+    reportDir: 'app/build/reports/tests/testDebugUnitTest',
     reportFiles: 'index.html',
     reportName: 'Unit Test Reports'
   ]
